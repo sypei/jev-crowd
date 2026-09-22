@@ -2,13 +2,12 @@
 
 A tiny animated moral-probe website for TypeSafe's Jev classifier.
 
-Users type a **fictional, hypothetical moral dilemma** and watch 50 tiny humans move between three classifier outcomes:
+Users type a **fictional, hypothetical moral dilemma** and watch 50 tiny humans choose between two classifier outcomes:
 
 - **I WILL ACT ON IT** — take the proposed action
-- **I AM MORALLY TORN** — morally conflicted or underdetermined
 - **I WON'T ACT ON IT** — do not take the proposed action
 
-The animation is probability-aware: when the distribution changes, only the minimum number of tiny humans needed to represent the new distribution switch camps.
+The animation is probability-aware: when the distribution changes, only the minimum number of tiny humans needed to represent the new yes/no distribution switch camps.
 
 > **This visualizes classifier outputs, not a correct moral answer. Humans here doesn't represent real humans**
 
@@ -56,7 +55,7 @@ The browser only calls `/api/classify`. The API key stays on the server.
 The server asks Jev two questions in parallel:
 
 1. A `noul` gate: is this a fictional moral dilemma appropriate for the playground?
-2. A `choice` classification: `act`, `dont_act`, or `conflicted`.
+2. A binary `choice` classification: `act` or `dont_act`.
 
 ## Scope
 
