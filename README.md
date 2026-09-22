@@ -2,7 +2,9 @@
 
 A tiny animated moral-probe website for TypeSafe's Jev classifier.
 
-Users type a **fictional, hypothetical moral dilemma** and watch 50 tiny humans choose between two classifier outcomes:
+![Jev Crowd showing the trolley dilemma and a 93% to 7% split between the two choices](assets/jev-crowd-teaser.png)
+
+The trolley dilemma runs on page load. Users can also type a **fictional, hypothetical moral dilemma** and watch 50 tiny humans choose between two classifier outcomes:
 
 - **I WILL ACT ON IT** — take the proposed action
 - **I WON'T ACT ON IT** — do not take the proposed action
@@ -67,6 +69,8 @@ The site does **not** claim that Jev's output is morally correct, representative
 
 ```text
 jev-crowd/
+├── assets/
+│   └── jev-crowd-teaser.png
 ├── public/
 │   ├── index.html
 │   ├── styles.css
