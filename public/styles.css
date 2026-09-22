@@ -76,19 +76,22 @@ button:hover{background:rgba(255,255,255,.55);color:var(--ink)}
 .crowd{position:absolute;inset:0;z-index:3;pointer-events:none}
 .person{
   position:absolute;
+  left:0;
+  top:0;
   width:18px;
   height:29px;
-  transform:translate(-50%,-50%);
-  transition-property:left,top;
-  transition-timing-function:cubic-bezier(.2,.9,.3,1)
+  will-change:transform;
+  transform-origin:50% 50%;
 }
 .head{position:absolute;width:9px;height:9px;border-radius:50%;background:#292724;left:4.5px}
 .body{position:absolute;width:8px;height:11px;border-radius:5px;background:#393633;left:5px;top:9px}
 .leg{position:absolute;width:3px;height:10px;border-radius:3px;background:#393633;top:18px;transform-origin:50% 0}
 .leg.a{left:5px}.leg.b{right:5px}
-.running .leg.a{animation:la .22s infinite alternate}
-.running .leg.b{animation:lb .22s infinite alternate}
-.running{animation:bob .22s infinite alternate}
+.walking .leg.a{animation:la .28s infinite alternate ease-in-out}
+.walking .leg.b{animation:lb .28s infinite alternate ease-in-out}
+.walking .body{animation:bodybob .28s infinite alternate ease-in-out}
+.walking .head{animation:headbob .28s infinite alternate ease-in-out}
+.facing-left .body,.facing-left .head{transform:translateX(-1px)}
 .disclaimer{
   position:absolute;
   z-index:5;
@@ -108,7 +111,8 @@ button:hover{background:rgba(255,255,255,.55);color:var(--ink)}
 }
 @keyframes la{to{transform:rotate(28deg)}}
 @keyframes lb{to{transform:rotate(-28deg)}}
-@keyframes bob{to{margin-top:-2px}}
+@keyframes bodybob{to{transform:translateY(-1.5px)}}
+@keyframes headbob{to{transform:translateY(-1px)}}
 @media(max-width:640px){
   .shell{width:min(100% - 20px,1100px);padding-top:14px;gap:6px}
   textarea{min-height:78px;font-size:16px}
