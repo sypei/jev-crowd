@@ -179,3 +179,5 @@ window.addEventListener("resize",()=>{
 
 people.forEach(p=>setDestination(p,false));
 requestAnimationFrame(animate);
+dilemma.value=presets.trolley;
+classify(dilemma.value);
