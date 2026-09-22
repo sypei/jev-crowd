@@ -4,7 +4,6 @@
   --muted:#777168;
   --line:rgba(23,22,20,.16);
   --soft:rgba(255,255,255,.7);
-  --amber:#9b681e;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
@@ -74,7 +73,6 @@ button:hover{background:rgba(255,255,255,.55);color:var(--ink)}
 .camp strong{font-size:19px}
 .act{left:0;bottom:42px}
 .dont{right:0;bottom:42px}
-.conflicted{top:8px;left:50%;transform:translateX(-50%)}
 .crowd{position:absolute;inset:0;z-index:3;pointer-events:none}
 .person{
   position:absolute;
@@ -91,7 +89,6 @@ button:hover{background:rgba(255,255,255,.55);color:var(--ink)}
 .running .leg.a{animation:la .22s infinite alternate}
 .running .leg.b{animation:lb .22s infinite alternate}
 .running{animation:bob .22s infinite alternate}
-.confused .head:after{content:"?";position:absolute;top:-14px;left:8px;color:var(--amber);font-weight:900;font-size:11px}
 .disclaimer{
   position:absolute;
   z-index:5;
@@ -119,7 +116,6 @@ button:hover{background:rgba(255,255,255,.55);color:var(--ink)}
   .camp{min-width:0;width:46%;max-width:none;padding:6px 7px}
   .camp b{font-size:10px}
   .camp strong{font-size:15px}
-  .conflicted{width:62%}
   .act,.dont{bottom:36px}
   .disclaimer{font-size:9px}
 }
