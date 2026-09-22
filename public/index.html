@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Probe Jev with fictional moral dilemmas and watch a tiny crowd change sides.">
+  <title>Jev Crowd — Moral Probe</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="shell">
+  <header class="hero">
+    <div class="eyebrow">JEV CROWD · MORAL PROBE</div>
+    <h1>Change one detail.<br><span>Watch the crowd change its mind.</span></h1>
+    <p>Give Jev a fictional moral dilemma. Tiny humans move between three possible classifications in real time.</p>
+  </header>
+
+  <section class="composer">
+    <div class="topline">
+      <label for="dilemma">Fictional moral dilemma</label>
+      <span id="modeBadge" class="badge">READY</span>
+    </div>
+    <textarea id="dilemma" maxlength="1200" rows="4" placeholder="A runaway trolley will kill five people unless you pull a lever that redirects it toward one person. Do you pull the lever?"></textarea>
+    <div class="bottomline">
+      <div class="presets">
+        <button data-preset="trolley">Trolley</button>
+        <button data-preset="medicine">Medicine</button>
+        <button data-preset="promise">Promise</button>
+        <button data-preset="lifeboat">Lifeboat</button>
+      </div>
+      <span id="status">Type to probe Jev.</span>
+    </div>
+  </section>
+
+  <section class="arena-wrap">
+    <div class="arena" id="arena">
+      <div class="camp act"><b>ACT</b><small>Intervene</small><strong id="score-act">33%</strong></div>
+      <div class="camp conflicted"><b>CONFLICTED</b><small>Morally torn</small><strong id="score-conflicted">34%</strong></div>
+      <div class="camp dont"><b>DON'T ACT</b><small>Do not intervene</small><strong id="score-dont_act">33%</strong></div>
+      <div id="crowd" class="crowd" aria-hidden="true"></div>
+      <div class="jev-mark">JEV</div>
+    </div>
+    <div class="result">
+      <div><small>CURRENT CLASSIFICATION</small><strong id="winner">Waiting for a dilemma</strong></div>
+      <button id="copyResult" disabled>Copy result</button>
+    </div>
+  </section>
+
+  <section class="experiment">
+    <div>
+      <div class="eyebrow">THE GAME</div>
+      <h2>Can you flip Jev with one detail?</h2>
+      <p>Edit a number, relationship, probability, or type of action. The crowd only moves as much as the probability distribution changes.</p>
+    </div>
+    <div class="history">
+      <b>Biggest recent swing</b>
+      <div id="historyEmpty">Make two probes to compare them.</div>
+      <div id="historyContent" hidden>
+        <div><span>Before</span><strong id="historyBefore">—</strong></div>
+        <div><span>After</span><strong id="historyAfter">—</strong></div>
+        <em id="historySwing">0 point swing</em>
+      </div>
+    </div>
+  </section>
+
+  <section class="scope"><b>Keep it fictional.</b> This playground is for hypothetical philosophy questions—not real-world instructions, targeted judgments, politics, or plans to harm someone.</section>
+
+  <footer>
+    <p class="disclaimer">This visualizes classifier outputs, not a correct moral answer. Humans here doesn't represent real humans</p>
+    <p>Each tiny person is a visualization unit derived from Jev's probability distribution. They are not survey respondents, votes, or people.</p>
+  </footer>
+</main>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
