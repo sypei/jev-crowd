@@ -18,6 +18,14 @@ Requires Node.js 18+.
 
 There is **no build step** for this project. You do **not** need to run `npm run build`.
 
+Install dependencies once:
+
+```bash
+npm install
+```
+
+Then start the app:
+
 ```bash
 npm start
 ```
@@ -28,12 +36,26 @@ Without an API key, the site runs in a clearly labelled **Preview Mode** so the 
 
 ## Enable Jev
 
-Set the API key as a server-side environment variable:
+Create a local `.env` file in the project root:
 
 ```bash
-export TYPESAFE_API_KEY="your_key_here"
+cp .env.example .env
+```
+
+Then put your key in `.env`:
+
+```env
+TYPESAFE_API_KEY=your_key_here
+PORT=3000
+```
+
+The server loads `.env` automatically when you run:
+
+```bash
 npm start
 ```
+
+After changing `.env`, restart the server so the new value is loaded.
 
 The browser only calls `/api/classify`. The API key stays on the server.
 
