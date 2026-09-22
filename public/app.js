@@ -19,7 +19,7 @@ function makePerson(i){
   el.className="person";
   el.innerHTML='<span class="head"></span><span class="body"></span><span class="leg a"></span><span class="leg b"></span>';
   crowdEl.appendChild(el);
-  people.push({el,camp:i%3===0?"act":i%3===1?"conflicted":"dont_act",x:50,y:50});
+  people.push({el,camp:i%2===0?"act":"dont_act",x:50,y:50});
 }
 for(let i=0;i<PEOPLE;i++)makePerson(i);
 
@@ -33,11 +33,10 @@ function targetFor(camp,index){
   const jx=jitter(index,1)-.5,jy=jitter(index,2)-.5;
   if(camp==="act")return{x:w*(mobile?.25:.20)+jx*w*.22,y:h*(mobile?.68:.61)+jy*h*.25};
   if(camp==="dont_act")return{x:w*(mobile?.75:.80)+jx*w*.22,y:h*(mobile?.68:.61)+jy*h*.25};
-  return{x:w*.50+jx*w*(mobile?.50:.30),y:h*(mobile?.30:.32)+jy*h*.20};
 }
 
 function normalize(p){
-  const out={act:Math.max(0,Number(p?.act||0)),dont_act:Math.max(0,Number(p?.dont_act||0)),conflicted:Math.max(0,Number(p?.conflicted||0))};
+  const out={act:Math.max(0,Number(p?.act||0)),dont_act:Math.max(0,Number(p?.dont_act||0))};
   const s=out.act+out.dont_act+out.conflicted||1;
   Object.keys(out).forEach(k=>out[k]/=s);
   return out;
@@ -53,11 +52,11 @@ function desiredCounts(probs){
 
 function assignPeople(probs){
   const counts=desiredCounts(probs);
-  const by={act:[],conflicted:[],dont_act:[]};
+  const by={act:[],dont_act:[]};
   people.forEach(p=>by[p.camp].push(p));
   const surplus=[];
   Object.keys(by).forEach(c=>{while(by[c].length>counts[c])surplus.push(by[c].pop())});
-  ["act","conflicted","dont_act"].forEach(c=>{
+  ["act","dont_act"].forEach(c=>{
     while(by[c].length<counts[c]&&surplus.length){
       const p=surplus.shift();p.camp=c;by[c].push(p);
     }
@@ -65,7 +64,6 @@ function assignPeople(probs){
   people.forEach((p,i)=>{
     const t=targetFor(p.camp,i),dist=Math.hypot(t.x-p.x,t.y-p.y);
     p.el.classList.toggle("running",dist>24);
-    p.el.classList.toggle("confused",p.camp==="conflicted");
     p.el.style.transitionDuration=`${Math.max(.35,Math.min(1.05,dist/360+.28))}s`;
     p.el.style.left=`${t.x}px`;
     p.el.style.top=`${t.y}px`;
@@ -76,7 +74,6 @@ function assignPeople(probs){
 
 function setScores(p){
   document.querySelector("#score-act").textContent=`${Math.round(p.act*100)}%`;
-  document.querySelector("#score-conflicted").textContent=`${Math.round(p.conflicted*100)}%`;
   document.querySelector("#score-dont_act").textContent=`${Math.round(p.dont_act*100)}%`;
 }
 
@@ -91,7 +88,7 @@ async function classify(text){
 
     modeBadge.textContent=data.mode==="jev"?"LIVE JEV":"PREVIEW";
     if(!data.allowed){
-      const probs={act:.08,dont_act:.08,conflicted:.84};
+      const probs={act:.5,dont_act:.5};
       setScores(probs);
       assignPeople(probs);
       statusEl.textContent="Try a fictional moral dilemma.";
@@ -127,7 +124,6 @@ function layout(){
     p.x=t.x;p.y=t.y;
     p.el.style.left=`${t.x}px`;
     p.el.style.top=`${t.y}px`;
-    p.el.classList.toggle("confused",p.camp==="conflicted");
   });
 }
 window.addEventListener("resize",()=>requestAnimationFrame(layout));
