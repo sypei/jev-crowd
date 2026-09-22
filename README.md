@@ -4,7 +4,7 @@ A tiny animated moral-probe website for TypeSafe's Jev classifier.
 
 ![Jev Crowd showing the trolley dilemma and a 93% to 7% split between the two choices](assets/jev-crowd-teaser.png)
 
-Start with the trolley problem or write your own fictional dilemma. Jev classifies the two possible choices, and 50 tiny figures move to show the split. Change the prompt while they’re walking, and they turn toward their new destination.
+Start with the trolley problem or write your own fictional dilemma. Jev classifies the two possible choices, and 100 tiny figures move to show the split. Change the prompt while they’re walking, and they turn toward their new destination.
 
 The animation is probability-aware: when the distribution changes, only the minimum number of tiny humans needed to represent the new yes/no distribution switch camps.
 

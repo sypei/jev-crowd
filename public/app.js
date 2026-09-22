@@ -14,7 +14,7 @@ const presets={
   lifeboat:"A lifeboat is overloaded and will sink unless one passenger leaves. If nobody volunteers, is it right for the group to choose one person to remove so everyone else survives?"
 };
 
-const PEOPLE=50,people=[];
+const PEOPLE=100,people=[];
 let debounceTimer=null,requestId=0,lastFrame=performance.now();
 const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
