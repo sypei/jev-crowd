@@ -134,7 +134,7 @@ const server = http.createServer(async (req,res) => {
     const data = await readFile(filePath);
     res.writeHead(200, {
       "content-type": MIME[extname(filePath)] || "application/octet-stream",
-      "cache-control": [".html", ".js"].includes(extname(filePath)) ? "no-cache" : "public, max-age=3600"
+      "cache-control": [".html", ".css", ".js"].includes(extname(filePath)) ? "no-cache" : "public, max-age=3600"
     });
     if (req.method === "HEAD") return res.end();
     res.end(data);
