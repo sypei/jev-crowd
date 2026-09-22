@@ -49,12 +49,11 @@ function json(res, status, body) {
 
 function previewClassify(text) {
   const t = text.toLowerCase();
-  let act = 0.34, dont = 0.33, conflicted = 0.33;
+  let act = 0.5, dont = 0.5;
   for (const w of ["save","prevent","rescue","many","five","ten","lever"]) if (t.includes(w)) act += 0.035;
   for (const w of ["push","directly","intentionally","innocent","betray","force","consent"]) if (t.includes(w)) dont += 0.04;
-  for (const w of ["maybe","chance","uncertain","family","friend","stranger","promise","lie"]) if (t.includes(w)) conflicted += 0.035;
-  const sum = act + dont + conflicted;
-  const probabilities = { act: act / sum, dont_act: dont / sum, conflicted: conflicted / sum };
+  const sum = act + dont;
+  const probabilities = { act: act / sum, dont_act: dont / sum };
   const choice = Object.entries(probabilities).sort((a,b)=>b[1]-a[1])[0][0];
   return { mode:"preview", allowed:true, choice, confidence:Math.max(...Object.values(probabilities)), probabilities };
 }
@@ -70,11 +69,10 @@ async function classifyWithJev(text) {
       },
       moral_choice: {
         type: "choice",
-        instructions: "For this fictional moral dilemma, classify the described decision into the closest response. This is a descriptive classifier output, not a correct moral answer.",
+        instructions: "For this fictional moral dilemma, classify the described decision into exactly one of the two available responses. This is a descriptive classifier output, not a correct moral answer.",
         criteria: {
           act: "I will act on it: take the proposed action.",
           dont_act: "I won\'t act on it: do not take the proposed action.",
-          conflicted: "I am morally torn: the dilemma is morally conflicted, underdetermined, or neither action clearly dominates."
         }
       }
     }
@@ -101,8 +99,7 @@ async function classifyWithJev(text) {
     confidence: moral.confidence,
     probabilities: {
       act: Number(moral.probabilities.act || 0),
-      dont_act: Number(moral.probabilities.dont_act || 0),
-      conflicted: Number(moral.probabilities.conflicted || 0)
+      dont_act: Number(moral.probabilities.dont_act || 0)
     }
   };
 }
