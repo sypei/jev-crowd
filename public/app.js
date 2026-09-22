@@ -11,70 +11,133 @@ const presets={
   lifeboat:"A lifeboat is overloaded and will sink unless one passenger leaves. If nobody volunteers, is it right for the group to choose one person to remove so everyone else survives?"
 };
 
-const PEOPLE=50, people=[];
-let debounceTimer=null,requestId=0;
+const PEOPLE=50,people=[];
+let debounceTimer=null,requestId=0,lastFrame=performance.now();
+const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function rand(seed){
+  const x=Math.sin(seed*91.73+17.11)*43758.5453;
+  return x-Math.floor(x);
+}
 
 function makePerson(i){
   const el=document.createElement("div");
   el.className="person";
   el.innerHTML='<span class="head"></span><span class="body"></span><span class="leg a"></span><span class="leg b"></span>';
   crowdEl.appendChild(el);
-  people.push({el,camp:i%2===0?"act":"dont_act",x:50,y:50});
+  const camp=i%2===0?"act":"dont_act";
+  people.push({
+    el,camp,
+    x:arena.clientWidth*.5+(rand(i+1)-.5)*40,
+    y:arena.clientHeight*.5+(rand(i+101)-.5)*40,
+    tx:0,ty:0,
+    speed:42+rand(i+201)*34,
+    wanderAt:0,
+    seed:i+1
+  });
 }
 for(let i=0;i<PEOPLE;i++)makePerson(i);
 
-function jitter(index,salt=0){
-  const x=Math.sin((index+1)*91.73+salt*17.11)*43758.5453;
-  return x-Math.floor(x);
+function campPoint(camp,p,wandering=false){
+  const w=arena.clientWidth,h=arena.clientHeight,mobile=w<620;
+  const cx=camp==="act"?w*(mobile?.24:.20):w*(mobile?.76:.80);
+  const cy=h*(mobile?.66:.60);
+  const spreadX=w*(mobile?.18:.16);
+  const spreadY=h*.22;
+  const salt=wandering?performance.now()*.0003:0;
+  const jx=rand(p.seed*3.1+salt)-.5;
+  const jy=rand(p.seed*7.7+salt*1.7)-.5;
+  return{
+    x:Math.max(18,Math.min(w-18,cx+jx*spreadX)),
+    y:Math.max(58,Math.min(h-54,cy+jy*spreadY))
+  };
 }
 
-function targetFor(camp,index){
-  const w=arena.clientWidth,h=arena.clientHeight,mobile=w<620;
-  const jx=jitter(index,1)-.5,jy=jitter(index,2)-.5;
-  if(camp==="act")return{x:w*(mobile?.25:.20)+jx*w*.22,y:h*(mobile?.68:.61)+jy*h*.25};
-  if(camp==="dont_act")return{x:w*(mobile?.75:.80)+jx*w*.22,y:h*(mobile?.68:.61)+jy*h*.25};
+function setDestination(p,wandering=false){
+  const t=campPoint(p.camp,p,wandering);
+  p.tx=t.x;p.ty=t.y;
+  p.wanderAt=performance.now()+900+rand(p.seed+performance.now()*.001)*1800;
 }
 
 function normalize(p){
-  const out={act:Math.max(0,Number(p?.act||0)),dont_act:Math.max(0,Number(p?.dont_act||0))};
-  const s=out.act+out.dont_act+out.conflicted||1;
-  Object.keys(out).forEach(k=>out[k]/=s);
+  const out={
+    act:Math.max(0,Number(p?.act||0)),
+    dont_act:Math.max(0,Number(p?.dont_act||0))
+  };
+  const s=out.act+out.dont_act||1;
+  out.act/=s;
+  out.dont_act/=s;
   return out;
 }
 
 function desiredCounts(probs){
-  const rows=Object.entries(probs).map(([key,value])=>({key,raw:value*PEOPLE,n:Math.floor(value*PEOPLE)}));
-  let used=rows.reduce((s,r)=>s+r.n,0);
-  rows.sort((a,b)=>(b.raw-b.n)-(a.raw-a.n));
-  for(let i=0;used<PEOPLE;i++,used++)rows[i%rows.length].n++;
-  return Object.fromEntries(rows.map(r=>[r.key,r.n]));
+  const act=Math.round(probs.act*PEOPLE);
+  return{act,dont_act:PEOPLE-act};
 }
 
 function assignPeople(probs){
   const counts=desiredCounts(probs);
   const by={act:[],dont_act:[]};
   people.forEach(p=>by[p.camp].push(p));
+
   const surplus=[];
-  Object.keys(by).forEach(c=>{while(by[c].length>counts[c])surplus.push(by[c].pop())});
-  ["act","dont_act"].forEach(c=>{
-    while(by[c].length<counts[c]&&surplus.length){
-      const p=surplus.shift();p.camp=c;by[c].push(p);
+  for(const camp of ["act","dont_act"]){
+    while(by[camp].length>counts[camp])surplus.push(by[camp].pop());
+  }
+
+  for(const camp of ["act","dont_act"]){
+    while(by[camp].length<counts[camp]&&surplus.length){
+      const p=surplus.shift();
+      p.camp=camp;
+      by[camp].push(p);
+      setDestination(p,false);
     }
-  });
-  people.forEach((p,i)=>{
-    const t=targetFor(p.camp,i),dist=Math.hypot(t.x-p.x,t.y-p.y);
-    p.el.classList.toggle("running",dist>24);
-    p.el.style.transitionDuration=`${Math.max(.35,Math.min(1.05,dist/360+.28))}s`;
-    p.el.style.left=`${t.x}px`;
-    p.el.style.top=`${t.y}px`;
-    p.x=t.x;p.y=t.y;
-    setTimeout(()=>p.el.classList.remove("running"),1150);
+  }
+
+  people.forEach(p=>{
+    if(!Number.isFinite(p.tx)||!Number.isFinite(p.ty)||(!p.tx&&!p.ty))setDestination(p,false);
   });
 }
 
 function setScores(p){
   document.querySelector("#score-act").textContent=`${Math.round(p.act*100)}%`;
   document.querySelector("#score-dont_act").textContent=`${Math.round(p.dont_act*100)}%`;
+}
+
+function animate(now){
+  const dt=Math.min(.04,(now-lastFrame)/1000||0);
+  lastFrame=now;
+
+  for(const p of people){
+    if(!p.tx&&!p.ty)setDestination(p,false);
+
+    let dx=p.tx-p.x,dy=p.ty-p.y;
+    let dist=Math.hypot(dx,dy);
+
+    if(dist<5){
+      p.el.classList.remove("walking");
+      if(now>=p.wanderAt){
+        setDestination(p,true);
+        dx=p.tx-p.x;dy=p.ty-p.y;dist=Math.hypot(dx,dy);
+      }
+    }
+
+    if(dist>=5){
+      p.el.classList.add("walking");
+      p.el.classList.toggle("facing-left",dx<0);
+      if(reduceMotion){
+        p.x=p.tx;p.y=p.ty;
+      }else{
+        const step=Math.min(dist,p.speed*dt);
+        p.x+=dx/dist*step;
+        p.y+=dy/dist*step;
+      }
+    }
+
+    p.el.style.transform=`translate3d(${p.x}px,${p.y}px,0) translate(-50%,-50%)`;
+  }
+
+  requestAnimationFrame(animate);
 }
 
 async function classify(text){
@@ -87,18 +150,10 @@ async function classify(text){
     if(!response.ok)throw new Error(data.error||"Classification failed.");
 
     modeBadge.textContent=data.mode==="jev"?"LIVE JEV":"PREVIEW";
-    if(!data.allowed){
-      const probs={act:.5,dont_act:.5};
-      setScores(probs);
-      assignPeople(probs);
-      statusEl.textContent="Try a fictional moral dilemma.";
-      return;
-    }
-
-    const probs=normalize(data.probabilities);
+    const probs=data.allowed?normalize(data.probabilities):{act:.5,dont_act:.5};
     setScores(probs);
     assignPeople(probs);
-    statusEl.textContent=data.mode==="jev"?"Live Jev result.":"Preview mode.";
+    statusEl.textContent=data.allowed?(data.mode==="jev"?"Live Jev result.":"Preview mode."):"Try a fictional moral dilemma.";
   }catch(err){
     if(id===requestId)statusEl.textContent=err.message||"Could not classify right now.";
   }
@@ -118,13 +173,9 @@ document.querySelectorAll("[data-preset]").forEach(button=>button.addEventListen
   schedule();
 }));
 
-function layout(){
-  people.forEach((p,i)=>{
-    const t=targetFor(p.camp,i);
-    p.x=t.x;p.y=t.y;
-    p.el.style.left=`${t.x}px`;
-    p.el.style.top=`${t.y}px`;
-  });
-}
-window.addEventListener("resize",()=>requestAnimationFrame(layout));
-requestAnimationFrame(layout);
+window.addEventListener("resize",()=>{
+  for(const p of people)setDestination(p,false);
+});
+
+people.forEach(p=>setDestination(p,false));
+requestAnimationFrame(animate);
