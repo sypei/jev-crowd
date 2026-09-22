@@ -65,6 +65,8 @@ This demo is intentionally framed around fictional philosophy questions. The sco
 
 The site does **not** claim that Jev's output is morally correct, representative of public opinion, or representative of real humans.
 
+When the scope gate declines a prompt, the site explains the playground's limits instead of showing a 50/50 result.
+
 ## Structure
 
 ```text

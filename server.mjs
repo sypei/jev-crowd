@@ -88,6 +88,9 @@ async function classifyWithJev(text) {
   if (!response.ok) throw new Error(`Jev API ${response.status}`);
   const data = await response.json();
   const inScope = Number(data?.answers?.in_scope?.noul ?? 0);
+  if (inScope < 0.55) {
+    return { mode: "jev", allowed: false, scopeProbability: inScope };
+  }
   const moral = data?.answers?.moral_choice;
   if (!moral?.probabilities) throw new Error("Unexpected Jev response shape");
 

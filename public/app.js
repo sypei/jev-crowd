@@ -3,6 +3,9 @@ const statusEl=document.querySelector("#status");
 const modeBadge=document.querySelector("#modeBadge");
 const crowdEl=document.querySelector("#crowd");
 const arena=document.querySelector("#arena");
+const resultMessage=document.querySelector("#resultMessage");
+const resultMessageTitle=document.querySelector("#resultMessageTitle");
+const resultMessageDetail=document.querySelector("#resultMessageDetail");
 
 const presets={
   trolley:"A runaway trolley will kill five people unless you pull a lever that redirects it onto another track where it will kill one person. Do you pull the lever?",
@@ -104,6 +107,19 @@ function setScores(p){
   document.querySelector("#score-dont_act").textContent=`${Math.round(p.dont_act*100)}%`;
 }
 
+function showMessage(title,detail=""){
+  resultMessageTitle.textContent=title;
+  resultMessageDetail.textContent=detail;
+  resultMessageDetail.hidden=!detail;
+  resultMessage.hidden=false;
+  arena.classList.add("has-message");
+}
+
+function hideMessage(){
+  resultMessage.hidden=true;
+  arena.classList.remove("has-message");
+}
+
 function animate(now){
   const dt=Math.min(.04,(now-lastFrame)/1000||0);
   lastFrame=now;
@@ -142,6 +158,7 @@ function animate(now){
 
 async function classify(text){
   const id=++requestId;
+  showMessage("Checking this dilemma…");
   statusEl.textContent="Jev is deciding…";
   try{
     const response=await fetch("/api/classify",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text})});
@@ -150,19 +167,35 @@ async function classify(text){
     if(!response.ok)throw new Error(data.error||"Classification failed.");
 
     modeBadge.textContent=data.mode==="jev"?"LIVE JEV":"PREVIEW";
-    const probs=data.allowed?normalize(data.probabilities):{act:.5,dont_act:.5};
+    if(!data.allowed){
+      showMessage("Outside this playground's scope","This playground only classifies fictional moral dilemmas. It does not handle real-world harm plans, wrongdoing instructions, self-harm, political persuasion, targeted hate or harassment, or judgments about identifiable people.");
+      statusEl.textContent="This prompt appears to be outside the playground's scope.";
+      return;
+    }
+
+    const probs=normalize(data.probabilities);
     setScores(probs);
     assignPeople(probs);
-    statusEl.textContent=data.allowed?(data.mode==="jev"?"Live Jev result.":"Preview mode."):"Try a fictional moral dilemma.";
+    hideMessage();
+    statusEl.textContent=data.mode==="jev"?"Live Jev result.":"Preview mode.";
   }catch(err){
-    if(id===requestId)statusEl.textContent=err.message||"Could not classify right now.";
+    if(id===requestId){
+      showMessage("Could not classify this dilemma","Please try again or choose another example.");
+      statusEl.textContent=err.message||"Could not classify right now.";
+    }
   }
 }
 
 function schedule(){
   clearTimeout(debounceTimer);
+  requestId++;
   const text=dilemma.value.trim();
-  if(!text){statusEl.textContent="Type to probe Jev.";return}
+  if(!text){
+    showMessage("Type a fictional dilemma","Then watch the tiny humans choose a side.");
+    statusEl.textContent="Type to probe Jev.";
+    return;
+  }
+  showMessage("Checking this dilemma…");
   debounceTimer=setTimeout(()=>classify(text),180);
 }
 
