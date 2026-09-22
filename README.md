@@ -18,13 +18,7 @@ Requires Node.js 18+.
 
 There is **no build step** for this project. You do **not** need to run `npm run build`.
 
-Install dependencies once:
-
-```bash
-npm install
-```
-
-Then start the app:
+There are no npm dependencies to install. Start the app directly:
 
 ```bash
 npm start
@@ -49,7 +43,7 @@ TYPESAFE_API_KEY=your_key_here
 PORT=3000
 ```
 
-The server loads `.env` automatically when you run:
+The server loads `.env` automatically using a small built-in loader when you run:
 
 ```bash
 npm start
