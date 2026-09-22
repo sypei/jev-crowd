@@ -2,11 +2,11 @@
 
 A tiny animated moral-probe website for TypeSafe's Jev classifier.
 
-Users type a **fictional, hypothetical moral dilemma** and watch 42 tiny humans move between three classifier outcomes:
+Users type a **fictional, hypothetical moral dilemma** and watch 50 tiny humans move between three classifier outcomes:
 
-- **ACT** — intervene / take the proposed action
-- **CONFLICTED** — morally torn or underdetermined
-- **DON'T ACT** — do not intervene
+- **I WILL ACT ON IT** — take the proposed action
+- **I AM MORALLY TORN** — morally conflicted or underdetermined
+- **I WON'T ACT ON IT** — do not take the proposed action
 
 The animation is probability-aware: when the distribution changes, only the minimum number of tiny humans needed to represent the new distribution switch camps.
 
@@ -15,6 +15,8 @@ The animation is probability-aware: when the distribution changes, only the mini
 ## Run locally
 
 Requires Node.js 18+.
+
+There is **no build step** for this project. You do **not** need to run `npm run build`.
 
 ```bash
 npm start
