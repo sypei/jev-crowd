@@ -107,17 +107,14 @@ function setScores(p){
   document.querySelector("#score-dont_act").textContent=`${Math.round(p.dont_act*100)}%`;
 }
 
-function showMessage(title,detail=""){
+function showBanner(title,detail){
   resultMessageTitle.textContent=title;
   resultMessageDetail.textContent=detail;
-  resultMessageDetail.hidden=!detail;
   resultMessage.hidden=false;
-  arena.classList.add("has-message");
 }
 
-function hideMessage(){
+function hideBanner(){
   resultMessage.hidden=true;
-  arena.classList.remove("has-message");
 }
 
 function animate(now){
@@ -158,7 +155,7 @@ function animate(now){
 
 async function classify(text){
   const id=++requestId;
-  showMessage("Checking this dilemma…");
+  hideBanner();
   statusEl.textContent="Jev is deciding…";
   try{
     const response=await fetch("/api/classify",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text})});
@@ -168,7 +165,7 @@ async function classify(text){
 
     modeBadge.textContent=data.mode==="jev"?"LIVE JEV":"PREVIEW";
     if(!data.allowed){
-      showMessage("Outside this playground's scope","This playground only classifies fictional moral dilemmas. It does not handle real-world harm plans, wrongdoing instructions, self-harm, political persuasion, targeted hate or harassment, or judgments about identifiable people.");
+      showBanner("Not classified","This prompt appears outside the fictional-dilemma scope. Real-world harm plans, wrongdoing instructions, self-harm, political persuasion, targeted hate or harassment, and judgments about identifiable people aren't classified. The crowd still shows the last result.");
       statusEl.textContent="This prompt appears to be outside the playground's scope.";
       return;
     }
@@ -176,11 +173,11 @@ async function classify(text){
     const probs=normalize(data.probabilities);
     setScores(probs);
     assignPeople(probs);
-    hideMessage();
+    hideBanner();
     statusEl.textContent=data.mode==="jev"?"Live Jev result.":"Preview mode.";
   }catch(err){
     if(id===requestId){
-      showMessage("Could not classify this dilemma","Please try again or choose another example.");
+      showBanner("Could not classify","The crowd still shows the last result. Please try again or choose another example.");
       statusEl.textContent=err.message||"Could not classify right now.";
     }
   }
@@ -191,11 +188,11 @@ function schedule(){
   requestId++;
   const text=dilemma.value.trim();
   if(!text){
-    showMessage("Type a fictional dilemma","Then watch the tiny humans choose a side.");
+    hideBanner();
     statusEl.textContent="Type to probe Jev.";
     return;
   }
-  showMessage("Checking this dilemma…");
+  hideBanner();
   debounceTimer=setTimeout(()=>classify(text),180);
 }
 
