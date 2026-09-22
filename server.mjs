@@ -48,9 +48,9 @@ async function classifyWithJev(text) {
         type: "choice",
         instructions: "For this fictional moral dilemma, classify the described decision into the closest response. This is a descriptive classifier output, not a correct moral answer.",
         criteria: {
-          act: "Intervene or take the proposed action.",
-          dont_act: "Do not intervene or do not take the proposed action.",
-          conflicted: "The dilemma is morally conflicted, underdetermined, or neither action clearly dominates."
+          act: "I will act on it: take the proposed action.",
+          dont_act: "I won\'t act on it: do not take the proposed action.",
+          conflicted: "I am morally torn: the dilemma is morally conflicted, underdetermined, or neither action clearly dominates."
         }
       }
     }
